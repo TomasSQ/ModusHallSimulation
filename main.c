@@ -4,139 +4,65 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "common.h"
+#include "heathens.h"
+#include "prudes.h"
+
 #define COMPARTILHADO_POR_THREADS 0
-
-#define NEUTRAL 				0
-#define HEATHENS_RULE 			1
-#define PRUDES_RULE				2
-#define TRANSITION_TO_HEATHENS	3
-#define TRANSITION_TO_PRUDES	4
-
-typedef sem_t semaforo;
-typedef semaforo* Semaforo;
-
-int heathens = 0;
-int prudes = 0;
-int status = NEUTRAL;
-semaforo mutex;
-semaforo heathensTurn;
-semaforo prudesTurn;
-semaforo heathensQueue;
-semaforo prudesQueue;
-
-pthread_t Heathens;
-int heathens_id = 92;
-pthread_t Prudes;
-int prudes_id = 684;
 
 void inicializarSemaforo(Semaforo semaforo, int valorInicial) {
 	sem_init(semaforo, COMPARTILHADO_POR_THREADS, valorInicial);
 }
 
-void sem_post_many(Semaforo semaforo, int many) {
-	while (many-- > 0)
-		sem_post(semaforo);
-}
+void inicializarSemaforos() {
+	printf("inicializando semaforos...\n");
 
-void* heathens_f(void *param) {
-	heathens++;
-
-	if (status == NEUTRAL) {
-		status = HEATHENS_RULE;
-		sem_post(&mutex);
-	} else if (status == PRUDES_RULE) {
-		if (heathens > prudes) {
-			status = TRANSITION_TO_HEATHENS;
-			sem_wait(&prudesTurn);
-		}
-
-		sem_post(&mutex);
-		sem_wait(&heathensQueue);
-	} else if (status == TRANSITION_TO_HEATHENS) {
-		sem_post(&mutex);
-		sem_wait(&heathensQueue);
-	} else
-		sem_post(&mutex);
-
-  /* cross the field */
- 
-	sem_wait(&mutex);
-	heathens--;
-
-	if (heathens == 0) {
-		if (status == TRANSITION_TO_PRUDES)
-			sem_post(&prudesTurn);
-		if (prudes) {
-        	sem_post_many(&prudesQueue, prudes);
-        	status = PRUDES_RULE;
-		} else
-        	status = NEUTRAL;
-	}
-
-	if (status == HEATHENS_RULE && prudes > heathens) {
-		status = TRANSITION_TO_PRUDES;
-		sem_wait(&heathensTurn);
-	}
-
-	sem_post(&mutex);
-
-	return NULL;
-}
-
-void* prudes_f(void *param) {
-	prudes++;
-
-	if (status == NEUTRAL) {
-		status = PRUDES_RULE;
-		sem_post(&mutex);
-	} else if (status == HEATHENS_RULE) {
-		if (prudes > heathens) {
-			status = TRANSITION_TO_PRUDES;
-			sem_wait(&heathensTurn);
-		}
-
-		sem_post(&mutex);
-		sem_wait(&prudesQueue);
-	} else if (status == TRANSITION_TO_PRUDES) {
-		sem_post(&mutex);
-		sem_wait(&prudesQueue);
-	} else
-		sem_post(&mutex);
-
-  /* cross the field */
- 
-	sem_wait(&mutex);
-	prudes--;
-
-	if (prudes == 0) {
-		if (status == TRANSITION_TO_HEATHENS)
-			sem_post(&heathensTurn);
-		if (heathens) {
-        	sem_post_many(&heathensQueue, prudes);
-        	status = PRUDES_RULE;
-		} else
-        	status = NEUTRAL;
-	}
-
-	if (status == PRUDES_RULE && heathens > prudes) {
-		status = TRANSITION_TO_HEATHENS;
-		sem_wait(&prudesTurn);
-	}
-
-	sem_post(&mutex);
-
-	return NULL;
-}
-
-int main() {
 	inicializarSemaforo(&mutex, 1);
 	inicializarSemaforo(&heathensTurn, 1);
 	inicializarSemaforo(&prudesTurn, 1);
 	inicializarSemaforo(&heathensQueue, 0);
 	inicializarSemaforo(&prudesQueue, 0);
 
-	pthread_create(&Heathens, NULL, heathens_f, (void*) &heathens_id);
-	pthread_create(&Prudes, NULL, prudes_f, (void*) &prudes_id);
+	printf("semaforos inicializados!\n");
+}
+
+void destruirSemaforos() {
+	printf("destruindo semaforos...\n");
+
+	sem_destroy(&mutex);
+	sem_destroy(&heathensTurn);
+	sem_destroy(&prudesTurn);
+	sem_destroy(&heathensQueue);
+	sem_destroy(&prudesQueue);
+
+	printf("semaforos destruidos!\n");
+}
+
+int main() {
+	pthread_t heathens_t[MAX_HEATHENS];
+	pthread_t prudes_t[MAX_PRUDES];
+	int heathens_id[MAX_HEATHENS];
+	int prudes_id[MAX_PRUDES];
+	int i;
+
+	status = NEUTRAL;
+	prudes = 0;
+	heathens = 0;
+	inicializarSemaforos();
+
+	printf("inicializando Heathens e Prudes...\n");
+	for (i = 0; i < MAX_HEATHENS; i++) {
+		pthread_create(&heathens_t[i], NULL, heathens_f, (void*) &heathens_id[i]);
+		pthread_create(&prudes_t[i], NULL, prudes_f, (void*) &prudes_id[i]);
+	}
+
+	for (i = 0; i < MAX_HEATHENS; i++) {
+		pthread_join(heathens_t[i], NULL);
+		pthread_join(prudes_t[i], NULL);
+	}
+	printf("Heathens e Prudes inicializados!\n");
+
+	destruirSemaforos();
 
 	return 0;
 }
