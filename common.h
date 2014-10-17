@@ -23,4 +23,6 @@ semaforo heathensQueue;
 
 void sem_post_many(Semaforo semaforo, int many);
 
+char* statusStr(int status);
+
 #endif
