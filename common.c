@@ -21,3 +21,51 @@ char* statusStr(int status) {
 		default : return "PIROCA";
 	}
 }
+
+void renderState () {
+	int i;
+	int heathensQueueSize = heathens;
+	int prudesQueueSize = prudes;
+
+	sem_wait(&animation);
+
+	if (crossing == 1) {
+		heathensQueueSize--;
+	} else if (crossing == 2) {
+		prudesQueueSize--;
+	}
+
+	for (i = 0; i < 10; i++) {
+		if (i < (heathensQueueSize - 10)) {
+			printf("[H]");
+		} else {
+			printf("[ ]");
+		}
+	}
+
+	for (i = 0; i < 10; i++) {
+		if (crossing != 0 && crossingPosition == i) {
+			if (crossing == 1) {
+				printf("[H]");
+			} else if (crossing == 2) {
+				printf("[P]");
+			} else {
+				printf("[who am I?]");
+			}
+		} else {
+			printf("___");
+		}
+	}
+
+	for (i = 0; i < 10; i++) {
+		if (i < prudesQueueSize) {
+			printf("[P]");
+		} else {
+			printf("[ ]");
+		}
+	}
+
+	printf("\n");
+
+	sem_post(&animation);
+}

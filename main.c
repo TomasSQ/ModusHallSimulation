@@ -17,6 +17,7 @@ void inicializarSemaforo(Semaforo semaforo, int valorInicial) {
 void inicializarSemaforos() {
 	printf("inicializando semaforos...\n");
 
+	inicializarSemaforo(&animation, 1);
 	inicializarSemaforo(&mutex, 1);
 	inicializarSemaforo(&heathensTurn, 1);
 	inicializarSemaforo(&prudesTurn, 1);
@@ -46,6 +47,8 @@ int main() {
 	int i;
 
 	status = NEUTRAL;
+	crossing = 0;
+	crossingPosition = 0;
 	prudes = 0;
 	heathens = 0;
 	inicializarSemaforos();

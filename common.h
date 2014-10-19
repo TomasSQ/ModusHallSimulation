@@ -10,6 +10,9 @@
 typedef sem_t semaforo;
 typedef semaforo* Semaforo;
 
+int crossing;
+int crossingPosition;
+
 int status;
 semaforo mutex;
 
@@ -21,8 +24,12 @@ int heathens;
 semaforo heathensTurn;
 semaforo heathensQueue;
 
+semaforo animation;
+
 void sem_post_many(Semaforo semaforo, int many);
 
 char* statusStr(int status);
+
+void renderState ();
 
 #endif
