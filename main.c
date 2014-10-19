@@ -17,6 +17,7 @@ void inicializarSemaforo(Semaforo semaforo, int valorInicial) {
 void inicializarSemaforos() {
 	printf("inicializando semaforos...\n");
 
+	inicializarSemaforo(&crossing, 1);
 	inicializarSemaforo(&animation, 1);
 	inicializarSemaforo(&mutex, 1);
 	inicializarSemaforo(&heathensTurn, 1);
@@ -30,6 +31,8 @@ void inicializarSemaforos() {
 void destruirSemaforos() {
 	printf("destruindo semaforos...\n");
 
+	sem_destroy(&crossing);
+	sem_destroy(&animation);
 	sem_destroy(&mutex);
 	sem_destroy(&heathensTurn);
 	sem_destroy(&prudesTurn);
@@ -47,21 +50,21 @@ int main() {
 	int i;
 
 	status = NEUTRAL;
-	crossing = 0;
+	crossingState = 0;
 	crossingPosition = 0;
 	prudes = 0;
 	heathens = 0;
 	inicializarSemaforos();
 
 	printf("inicializando Heathens e Prudes...\n");
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 4; i++) {
 		heathens_id[i] = i + 1;
 		prudes_id[i] = (i + 1) * 10;
 		pthread_create(&heathens_t[i], NULL, heathens_f, (void*) &heathens_id[i]);
 		pthread_create(&prudes_t[i], NULL, prudes_f, (void*) &prudes_id[i]);
 	}
 
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 4; i++) {
 		pthread_join(heathens_t[i], NULL);
 		pthread_join(prudes_t[i], NULL);
 	}

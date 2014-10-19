@@ -22,32 +22,34 @@ char* statusStr(int status) {
 	}
 }
 
-void renderState () {
+void renderState (int threadId) {
 	int i;
 	int heathensQueueSize = heathens;
 	int prudesQueueSize = prudes;
 
 	sem_wait(&animation);
 
-	if (crossing == 1) {
+	printf("{%02d} ", threadId);
+
+	if (crossingState == 1) {
 		heathensQueueSize--;
-	} else if (crossing == 2) {
+	} else if (crossingState == 2) {
 		prudesQueueSize--;
 	}
 
 	for (i = 0; i < 10; i++) {
-		if (i < (heathensQueueSize - 10)) {
+		if (i > (9 - heathensQueueSize)) {
 			printf("[H]");
 		} else {
-			printf("[ ]");
+			printf("   ");
 		}
 	}
 
 	for (i = 0; i < 10; i++) {
-		if (crossing != 0 && crossingPosition == i) {
-			if (crossing == 1) {
+		if (crossingState != 0 && crossingPosition == i) {
+			if (crossingState == 1) {
 				printf("[H]");
-			} else if (crossing == 2) {
+			} else if (crossingState == 2) {
 				printf("[P]");
 			} else {
 				printf("[who am I?]");
@@ -61,7 +63,7 @@ void renderState () {
 		if (i < prudesQueueSize) {
 			printf("[P]");
 		} else {
-			printf("[ ]");
+			printf("   ");
 		}
 	}
 
