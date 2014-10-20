@@ -57,14 +57,14 @@ int main() {
 	inicializarSemaforos();
 
 	printf("inicializando Heathens e Prudes...\n");
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 3; i++) {
 		heathens_id[i] = i + 1;
 		prudes_id[i] = (i + 1) * 10;
 		pthread_create(&heathens_t[i], NULL, heathens_f, (void*) &heathens_id[i]);
 		pthread_create(&prudes_t[i], NULL, prudes_f, (void*) &prudes_id[i]);
 	}
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 3; i++) {
 		pthread_join(heathens_t[i], NULL);
 		pthread_join(prudes_t[i], NULL);
 	}

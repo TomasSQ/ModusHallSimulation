@@ -19,10 +19,12 @@ void* prudes_f(void *param) {
 
 		if (status == NEUTRAL) {
 			status = PRUDES_RULE;
+
 			sem_post(&mutex);
 		} else if (status == HEATHENS_RULE) {
 			if (prudes > heathens) {
 				status = TRANSITION_TO_PRUDES;
+
 				sem_wait(&heathensTurn);
 			}
 
@@ -37,13 +39,14 @@ void* prudes_f(void *param) {
 		/* cross the field */
 		sem_wait(&crossing);
 		crossingState = 2;
-		for (i = 9; i >= 0; i--) {
+		for (i = HALL_DISTANCE-1; i >= 0; i--) {
 			crossingPosition = i;
 			renderState(threadId);
 			sleep(1);
 		}
 
 		crossingState = 0;
+
 		sem_post(&crossing);
 
 		sem_wait(&mutex);

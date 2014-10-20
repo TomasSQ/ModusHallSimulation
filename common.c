@@ -11,14 +11,18 @@ void sem_post_many(Semaforo semaforo, int many) {
 		sem_post(semaforo);
 }
 
+/*
+* Retorna o nome do status, normalizado para 22 chars (precisamos normalizar
+* para que a animação funciona corretamente, aka workaround)
+*/
 char* statusStr(int status) {
 	switch (status) {
-		case NEUTRAL : return "NEUTRAL";
-		case HEATHENS_RULE : return "HEATHENS RULE";
-		case PRUDES_RULE : return "PRUDES_RULE";
+		case NEUTRAL : return "NEUTRAL               ";
+		case HEATHENS_RULE : return "HEATHENS RULE         ";
+		case PRUDES_RULE : return "PRUDES RULE           ";
 		case TRANSITION_TO_HEATHENS : return "TRANSITION TO HEATHENS";
-		case TRANSITION_TO_PRUDES : return "TRANSITION TO PRUDES";
-		default : return "PIROCA";
+		case TRANSITION_TO_PRUDES : return "TRANSITION TO PRUDES  ";
+		default : return "WTF IS GOING ON?";
 	}
 }
 
@@ -45,7 +49,9 @@ void renderState (int threadId) {
 		}
 	}
 
-	for (i = 0; i < 10; i++) {
+	printf(" | ");
+
+	for (i = 0; i < HALL_DISTANCE; i++) {
 		if (crossingState != 0 && crossingPosition == i) {
 			if (crossingState == 1) {
 				printf("[H]");
@@ -59,6 +65,8 @@ void renderState (int threadId) {
 		}
 	}
 
+	printf(" | ");
+
 	for (i = 0; i < 10; i++) {
 		if (i < prudesQueueSize) {
 			printf("[P]");
@@ -67,7 +75,9 @@ void renderState (int threadId) {
 		}
 	}
 
-	printf("\n");
+	/* Para que os frames da animação não sejam apagados, substitua \r por \n */
+	printf("\t%s\r", statusStr(status));
+	fflush(stdout);
 
 	sem_post(&animation);
 }
