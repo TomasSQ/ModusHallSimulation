@@ -17,12 +17,18 @@ void sem_post_many(Semaforo semaforo, int many) {
 */
 char* statusStr(int status) {
 	switch (status) {
-		case NEUTRAL : return "NEUTRAL               ";
-		case HEATHENS_RULE : return "HEATHENS RULE         ";
-		case PRUDES_RULE : return "PRUDES RULE           ";
-		case TRANSITION_TO_HEATHENS : return "TRANSITION TO HEATHENS";
-		case TRANSITION_TO_PRUDES : return "TRANSITION TO PRUDES  ";
-		default : return "WTF IS GOING ON?";
+		case NEUTRAL : 
+			return "NEUTRAL               ";
+		case HEATHENS_RULE :
+			return "HEATHENS RULE         ";
+		case PRUDES_RULE :
+			return "PRUDES RULE           ";
+		case TRANSITION_TO_HEATHENS :
+			return "TRANSITION TO HEATHENS";
+		case TRANSITION_TO_PRUDES :
+			return "TRANSITION TO PRUDES  ";
+		default :
+			return "WTF IS GOING ON?";
 	}
 }
 
@@ -35,14 +41,14 @@ void renderState (int threadId) {
 
 	printf("{%02d} ", threadId);
 
-	if (crossingState == 1) {
+	if (crossingState == HEATHENS_CROSSING) {
 		heathensQueueSize--;
-	} else if (crossingState == 2) {
+	} else if (crossingState == PRUDES_CROSSING) {
 		prudesQueueSize--;
 	}
 
 	for (i = 0; i < 10; i++) {
-		if (i > (9 - heathensQueueSize)) {
+		if (i > 9 - heathensQueueSize) {
 			printf("[H]");
 		} else {
 			printf("   ");
@@ -52,13 +58,16 @@ void renderState (int threadId) {
 	printf(" | ");
 
 	for (i = 0; i < HALL_DISTANCE; i++) {
-		if (crossingState != 0 && crossingPosition == i) {
-			if (crossingState == 1) {
-				printf("[H]");
-			} else if (crossingState == 2) {
-				printf("[P]");
-			} else {
-				printf("[who am I?]");
+		if (crossingState != NONE_CROSSING && crossingPosition == i) {
+			switch (crossingState) {
+				case HEATHENS_CROSSING:
+					printf("[H]");
+					break;
+				case PRUDES_CROSSING:
+					printf("[P]");
+					break;
+				default:
+					printf("[who am I?]");
 			}
 		} else {
 			printf("___");

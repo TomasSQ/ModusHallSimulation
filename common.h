@@ -1,12 +1,18 @@
 #ifndef COMMON
 #define COMMON
 
+/* hall states */
 #define NEUTRAL 				0
 #define HEATHENS_RULE 			1
 #define PRUDES_RULE				2
 #define TRANSITION_TO_HEATHENS	3
 #define TRANSITION_TO_PRUDES	4
+
 #define HALL_DISTANCE			10
+
+#define NONE_CROSSING			0
+#define HEATHENS_CROSSING 		1
+#define PRUDES_CROSSING 		2
 
 typedef sem_t semaforo;
 typedef semaforo* Semaforo;
