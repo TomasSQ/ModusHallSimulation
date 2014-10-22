@@ -32,15 +32,40 @@ char* statusStr(int status) {
 	}
 }
 
-void renderState (int threadId) {
+char* stateStr(State state) {
+	switch (state) {
+		case CRIADA :			return "CRIADA                            ";
+		case ESPERANDO_MUTEX :		return "ESPERANDO_MUTEX                   ";
+		case ESPERANDO_PRUDES_TURN :	return "ESPERANDO_PRUDES_TURN             ";
+		case ESPERANDO_PRUDES_QUEUE :	return "ESPERANDO_PRUDES_QUEUE            ";
+		case ESPERANDO_HEATHENS_TURN :	return "ESPERANDO_HEATHENS_TURN           ";
+		case ESPERANDO_HEATHENS_QUEUE :	return "ESPERANDO_HEATHENS_QUEUE          ";
+		case ESPERANDO_ANIMATION :	return "ESPERANDO_ANIMATION               ";
+		case ESPERANDO_CROSSING :	return "ESPERANDO_CROSSING                ";
+		case ESPERANDO_DOING_SEMAFORO_POST_MANY : 
+						return "ESPERANDO_DOING_SEMAFORO_POST_MANY";
+		case EXECUTANDO :		return "EXECUTANDO                        ";
+	}
+
+	return "WTF";
+}
+
+void renderState (Thread thread) {
 	int i;
 	int heathensQueueSize = heathens;
 	int prudesQueueSize = prudes;
 
-	sem_wait(&animation);
+	wait(thread, animation, ESPERANDO_ANIMATION);
+	system("clear");
 
-	printf("{%02d} ", threadId);
+	printf("HEATHENS\t\t\t\t\t\t\tPRUDES\n");
+	for (i = 0; i < heathens_t->size; i++) {
+		printf("{%02d} %s", heathens_t->threads[i]->id, stateStr(heathens_t->threads[i]->state));
+		printf("\t\t\t\t");
+		printf("{%02d} %s\n", prudes_t->threads[i]->id, stateStr(prudes_t->threads[i]->state));
+	}
 
+	printf("{%02d} ", thread->id);
 	if (crossingState == HEATHENS_CROSSING) {
 		heathensQueueSize--;
 	} else if (crossingState == PRUDES_CROSSING) {
@@ -85,8 +110,46 @@ void renderState (int threadId) {
 	}
 
 	/* Para que os frames da animação não sejam apagados, substitua \r por \n */
-	printf("\t%s\r", statusStr(status));
+	printf("\t%s", statusStr(status));
 	fflush(stdout);
 
 	sem_post(&animation);
 }
+
+Thread newThread(int id, void *(*start_routine)(void*)) {
+	Thread thread = (Thread) malloc(sizeof(thread));
+	thread->id = id;
+	thread->state = CRIADA;
+	pthread_create(&thread->thread, NULL, start_routine, (void*) thread);
+
+	return thread;
+}
+
+
+
+Threads newThreads(int* ids, void *(*start_routine)(void*), int size) {
+	int i;
+	Threads threads = (Threads) malloc(sizeof(threads));
+	threads->size = size;
+
+	threads->threads = (Thread*) malloc(sizeof(Thread) * size);
+
+	for (i = 0; i < threads->size; i++)
+		threads->threads[i] = newThread(ids[i], start_routine);
+
+	return threads;
+}
+
+void startThreads(Threads threads) {
+	int i;
+
+	for (i = 0; i < threads->size; i++)
+		pthread_join(threads->threads[i]->thread, NULL);
+}
+
+void wait(Thread thread, semaforo semaforo, State beforeState) {
+	thread->state = beforeState;
+	sem_wait(&semaforo);
+	thread->state = EXECUTANDO;
+}
+

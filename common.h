@@ -1,3 +1,5 @@
+#include <pthread.h>
+
 #ifndef COMMON
 #define COMMON
 
@@ -17,27 +19,63 @@
 typedef sem_t semaforo;
 typedef semaforo* Semaforo;
 
-int crossingState;
-int crossingPosition;
+typedef enum State {
+	CRIADA,
+	ESPERANDO_MUTEX,
+	ESPERANDO_PRUDES_TURN,
+	ESPERANDO_PRUDES_QUEUE,
+	ESPERANDO_HEATHENS_TURN,
+	ESPERANDO_HEATHENS_QUEUE,
+	ESPERANDO_ANIMATION,
+	ESPERANDO_CROSSING,
+	ESPERANDO_DOING_SEMAFORO_POST_MANY,
+	EXECUTANDO
+} State;
 
-int status;
+typedef struct {
+	int id;
+	State state;
+	pthread_t thread;
+} thread;
+typedef thread* Thread;
+
+typedef struct {
+	int size;
+	Thread* threads;
+} threads;
+typedef threads* Threads;
+
+Threads heathens_t;
+Threads prudes_t;
+
+volatile int crossingState;
+volatile int crossingPosition;
+
+volatile int status;
 semaforo mutex;
 
-int prudes;
+volatile int prudes;
 semaforo prudesTurn;
 semaforo prudesQueue;
 
-int heathens;
+volatile int heathens;
 semaforo heathensTurn;
 semaforo heathensQueue;
 
 semaforo animation;
 semaforo crossing;
 
+semaforo doingSemaforoPostMany;
+
 void sem_post_many(Semaforo semaforo, int many);
 
 char* statusStr(int status);
 
-void renderState (int threadId);
+void renderState (Thread threadId);
+
+Thread newThread(int id, void *(*start_routine)(void*));
+Threads newThreads(int* ids, void *(*start_routine)(void*), int size);
+void startThreads(Threads threads);
+void wait(Thread thread, semaforo semaforo, State beforeState);
 
 #endif

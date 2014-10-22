@@ -3,7 +3,7 @@
 #ifndef HEATHENS
 #define HEATHENS
 
-#define MAX_HEATHENS 10
+#define MAX_HEATHENS 3
 
 void* heathens_f(void *param);
 

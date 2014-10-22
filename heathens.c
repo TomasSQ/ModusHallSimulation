@@ -8,16 +8,17 @@
 #include "heathens.h"
 
 void* heathens_f(void *param) {
+	Thread thread = (Thread) param;
 	int i;
-	int threadId = *(int *) param;
 
+	thread->state = EXECUTANDO;
 	while (1) {
-		sem_wait(&heathensTurn);
+		wait(thread, heathensTurn, ESPERANDO_HEATHENS_TURN);
 		sem_post(&heathensTurn);
-		sem_wait(&mutex);
+		wait(thread, mutex, ESPERANDO_MUTEX);
 		heathens++;
 
-		renderState(threadId);
+		renderState(thread);
 
 		if (status == NEUTRAL) {
 			status = HEATHENS_RULE;
@@ -25,32 +26,32 @@ void* heathens_f(void *param) {
 		} else if (status == PRUDES_RULE) {
 			if (heathens > prudes) {
 				status = TRANSITION_TO_HEATHENS;
-				sem_wait(&prudesTurn);
+				wait(thread, prudesTurn, ESPERANDO_PRUDES_TURN);
 			}
 
 			sem_post(&mutex);
-			sem_wait(&heathensQueue);
+			wait(thread, heathensQueue, ESPERANDO_HEATHENS_QUEUE);
 		} else if (status == TRANSITION_TO_HEATHENS) {
 			sem_post(&mutex);
-			sem_wait(&heathensQueue);
+			wait(thread, heathensQueue, ESPERANDO_HEATHENS_QUEUE);
 		} else
 			sem_post(&mutex);
 
 		/* cross the field */
-		sem_wait(&crossing);
+		wait(thread, crossing, ESPERANDO_CROSSING);
 		crossingState = HEATHENS_CROSSING;
 		for (i = 0; i < HALL_DISTANCE; i++) {
 			crossingPosition = i;
-			renderState(threadId);
+			renderState(thread);
 			sleep(1);
 		}
 		crossingState = NONE_CROSSING;
 
 		sem_post(&crossing);
 
-		sem_wait(&mutex);
+		wait(thread, mutex, ESPERANDO_MUTEX);
 		heathens--;
-		renderState(threadId);
+		renderState(thread);
 
 		if (heathens == 0) {
 			if (status == TRANSITION_TO_PRUDES)
@@ -64,7 +65,7 @@ void* heathens_f(void *param) {
 
 		if (status == HEATHENS_RULE && prudes > heathens) {
 			status = TRANSITION_TO_PRUDES;
-			sem_wait(&heathensTurn);
+			wait(thread, heathensTurn, ESPERANDO_HEATHENS_TURN);
 		}
 
 		sem_post(&mutex);

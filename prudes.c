@@ -7,15 +7,15 @@
 #include "prudes.h"
 
 void* prudes_f(void *param) {
+	Thread thread = (Thread) param;
 	int i;
-	int threadId = *(int *) param;
 
 	while (1) {
-		sem_wait(&prudesTurn);
+		wait(thread, prudesTurn, ESPERANDO_PRUDES_TURN);
 		sem_post(&prudesTurn);
-		sem_wait(&mutex);
+		wait(thread, mutex, ESPERANDO_MUTEX);
 		prudes++;
-		renderState(threadId);
+		renderState(thread);
 
 		if (status == NEUTRAL) {
 			status = PRUDES_RULE;
@@ -25,23 +25,23 @@ void* prudes_f(void *param) {
 			if (prudes > heathens) {
 				status = TRANSITION_TO_PRUDES;
 
-				sem_wait(&heathensTurn);
+				wait(thread, heathensTurn, ESPERANDO_HEATHENS_TURN);
 			}
 
 			sem_post(&mutex);
-			sem_wait(&prudesQueue);
+			wait(thread, prudesQueue, ESPERANDO_PRUDES_QUEUE);
 		} else if (status == TRANSITION_TO_PRUDES) {
 			sem_post(&mutex);
-			sem_wait(&prudesQueue);
+			wait(thread, prudesQueue, ESPERANDO_PRUDES_QUEUE);
 		} else
 			sem_post(&mutex);
 
 		/* cross the field */
-		sem_wait(&crossing);
+		wait(thread, crossing, ESPERANDO_CROSSING);
 		crossingState = PRUDES_CROSSING;
 		for (i = HALL_DISTANCE - 1; i >= 0; i--) {
 			crossingPosition = i;
-			renderState(threadId);
+			renderState(thread);
 			sleep(1);
 		}
 
@@ -49,9 +49,9 @@ void* prudes_f(void *param) {
 
 		sem_post(&crossing);
 
-		sem_wait(&mutex);
+		wait(thread, mutex, ESPERANDO_MUTEX);
 		prudes--;
-		renderState(threadId);
+		renderState(thread);
 
 		if (prudes == 0) {
 			if (status == TRANSITION_TO_HEATHENS)
@@ -65,7 +65,7 @@ void* prudes_f(void *param) {
 
 		if (status == PRUDES_RULE && heathens > prudes) {
 			status = TRANSITION_TO_HEATHENS;
-			sem_wait(&prudesTurn);
+			wait(thread, prudesTurn, ESPERANDO_PRUDES_TURN);
 		}
 
 		sem_post(&mutex);

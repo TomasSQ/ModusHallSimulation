@@ -3,7 +3,7 @@
 #ifndef PRUDES
 #define PRUDES
 
-#define MAX_PRUDES 10
+#define MAX_PRUDES 3
 
 void* prudes_f(void *param);
 
