@@ -42,7 +42,16 @@ void destruirSemaforos() {
 	printf("semaforos destruidos!\n");
 }
 
+void* renderHall(void *param) {
+	while (1) {
+		renderState(param);
+		usleep(500);
+	}
+
+}
+
 int main() {
+	Thread render;
 	int heathens_id[MAX_HEATHENS];
 	int prudes_id[MAX_PRUDES];
 	int i;
@@ -64,6 +73,8 @@ int main() {
 		prudes_id[i] = (i + 1) * 10;
 	prudes_t = newThreads(prudes_id, prudes_f, MAX_PRUDES);
 
+	render = newThread(0, renderHall);
+	pthread_join(render->thread, NULL);
 	startThreads(heathens_t);
 	startThreads(prudes_t);
 	printf("Heathens e Prudes inicializados!\n");

@@ -50,7 +50,7 @@ char* stateStr(State state) {
 	return "WTF";
 }
 
-void renderState (Thread thread) {
+void renderState(Thread thread) {
 	int i;
 	int heathensQueueSize = heathens;
 	int prudesQueueSize = prudes;

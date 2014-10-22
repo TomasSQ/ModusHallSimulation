@@ -15,7 +15,6 @@ void* prudes_f(void *param) {
 		sem_post(&prudesTurn);
 		wait(thread, mutex, ESPERANDO_MUTEX);
 		prudes++;
-		renderState(thread);
 
 		if (status == NEUTRAL) {
 			status = PRUDES_RULE;
@@ -41,7 +40,6 @@ void* prudes_f(void *param) {
 		crossingState = PRUDES_CROSSING;
 		for (i = HALL_DISTANCE - 1; i >= 0; i--) {
 			crossingPosition = i;
-			renderState(thread);
 			sleep(1);
 		}
 
@@ -51,13 +49,12 @@ void* prudes_f(void *param) {
 
 		wait(thread, mutex, ESPERANDO_MUTEX);
 		prudes--;
-		renderState(thread);
 
 		if (prudes == 0) {
 			if (status == TRANSITION_TO_HEATHENS)
 				sem_post(&heathensTurn);
 			if (heathens) {
-				sem_post(&heathensQueue);
+				sem_post_many(&heathensQueue, 1);
 				status = HEATHENS_RULE;
 			} else
 				status = NEUTRAL;
