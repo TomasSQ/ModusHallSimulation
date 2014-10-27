@@ -8,9 +8,6 @@
 #define TRANSITION_TO_HEATHENS	3
 #define TRANSITION_TO_PRUDES	4
 
-
-#define HALL_DISTANCE			10
-
 #define NONE_CROSSING			0
 #define HEATHENS_CROSSING 		1
 #define PRUDES_CROSSING 		2
@@ -37,6 +34,7 @@ typedef semaforo* Semaforo;
 
 int crossingState;
 int crossingPosition;
+int hallDistance;
 
 int status;
 semaforo mutex;

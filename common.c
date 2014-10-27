@@ -48,7 +48,7 @@ void printNSpaces(int n) {
 
 void printHall() {
 	int i;
-	for (i = 0; i < 3 * HALL_DISTANCE; i++)
+	for (i = 0; i < 3 * hallDistance; i++)
 		printf("_");
 }
 
@@ -62,7 +62,7 @@ void printWaitingAndWalking(char* waiting, char *walking, int heathensQueueStart
 
 	printf("   ");
 
-	for (i = 0; i < HALL_DISTANCE; i++)
+	for (i = 0; i < hallDistance; i++)
 		if (crossingState != 0 && crossingPosition == i)
 			printf("%s", walking);
 		else
@@ -89,7 +89,7 @@ void printLegsAnimation(int heathensQueueStartPosition, int prudesQueueSize) {
 
 	printf("   ");
 
-	for (i = 0; i < HALL_DISTANCE; i++)
+	for (i = 0; i < hallDistance; i++)
 		if (crossingState != 0 && crossingPosition == i)
 			switch (crossingPosition % 3) {
 				case 0:
@@ -173,7 +173,7 @@ void renderState (Thread thread) {
 
 	printf(" | ");
 
-	for (i = 0; i < HALL_DISTANCE; i++)
+	for (i = 0; i < hallDistance; i++)
 		if (crossingState != NONE_CROSSING && crossingPosition == i)
 			switch (crossingState) {
 				case HEATHENS_CROSSING:

@@ -39,7 +39,7 @@ void* heathens_f(void *param) {
 		/* cross the field */
 		sem_wait(&crossing);
 		crossingState = HEATHENS_CROSSING;
-		for (i = 0; i < HALL_DISTANCE; i++) {
+		for (i = 0; i < hallDistance; i++) {
 			crossingPosition = i;
 			renderState(thread);
 			usleep(SLEEP_DELAY);
@@ -70,7 +70,7 @@ void* heathens_f(void *param) {
 
 		sem_post(&mutex);
 
-		usleep(2 * (SLEEP_DELAY * HALL_DISTANCE) + rand() % (SLEEP_DELAY * HALL_DISTANCE * maxHeathens));
+		usleep(2 * (SLEEP_DELAY * hallDistance) + rand() % (SLEEP_DELAY * hallDistance * maxHeathens));
 	}
 
 	return NULL;

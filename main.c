@@ -56,6 +56,8 @@ int main() {
 	scanf("%d", &maxHeathens);
 	printf("\nQuantos Prudes? ");
 	scanf("%d", &maxPrudes);
+	printf("Tamanho do hall? ");
+	scanf("%d", &hallDistance);
 	inicializarSemaforos();
 
 	heathens_id = (int*) malloc(sizeof(int) * maxHeathens);

@@ -39,7 +39,7 @@ void* prudes_f(void *param) {
 		/* cross the field */
 		sem_wait(&crossing);
 		crossingState = PRUDES_CROSSING;
-		for (i = HALL_DISTANCE - 1; i >= 0; i--) {
+		for (i = hallDistance - 1; i >= 0; i--) {
 			crossingPosition = i;
 			renderState(thread);
 			usleep(SLEEP_DELAY);
@@ -71,7 +71,7 @@ void* prudes_f(void *param) {
 
 		sem_post(&mutex);
 
-		usleep(2 * (SLEEP_DELAY * HALL_DISTANCE) + rand() % (SLEEP_DELAY * HALL_DISTANCE * maxPrudes));
+		usleep(2 * (SLEEP_DELAY * hallDistance) + rand() % (SLEEP_DELAY * hallDistance * maxPrudes));
 	}
 
 	return NULL;
