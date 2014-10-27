@@ -56,18 +56,25 @@ int main() {
 	heathens = 0;
 	inicializarSemaforos();
 
-	printf("inicializando Heathens e Prudes...\n");
-	for (i = 0; i < 3; i++) {
+	printf("Inicializando Heathens e Prudes...\n");
+	for (i = 0; i < MAX_HEATHENS; i++) {
 		heathens_id[i] = i + 1;
-		prudes_id[i] = (i + 1) * 10;
 		pthread_create(&heathens_t[i], NULL, heathens_f, (void*) &heathens_id[i]);
+	}
+
+	for (i = 0; i < MAX_PRUDES; i++) {
+		prudes_id[i] = (i + 1) * 10;
 		pthread_create(&prudes_t[i], NULL, prudes_f, (void*) &prudes_id[i]);
 	}
 
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < MAX_HEATHENS; i++) {
 		pthread_join(heathens_t[i], NULL);
+	}
+
+	for (i = 0; i < MAX_PRUDES; i++) {
 		pthread_join(prudes_t[i], NULL);
 	}
+
 	printf("Heathens e Prudes inicializados!\n");
 
 	destruirSemaforos();

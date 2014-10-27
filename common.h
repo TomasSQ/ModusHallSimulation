@@ -6,7 +6,10 @@
 #define PRUDES_RULE				2
 #define TRANSITION_TO_HEATHENS	3
 #define TRANSITION_TO_PRUDES	4
-#define HALL_DISTANCE			10
+#define HALL_DISTANCE			4
+
+#define MAX_HEATHENS 2
+#define MAX_PRUDES 2
 
 typedef sem_t semaforo;
 typedef semaforo* Semaforo;

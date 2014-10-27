@@ -12,6 +12,7 @@ void* heathens_f(void *param) {
 	int threadId = *(int *) param;
 
 	while (1) {
+		printf("\n%02d arrived\n", threadId);
 		sem_wait(&heathensTurn);
 		sem_post(&heathensTurn);
 		sem_wait(&mutex);
@@ -54,9 +55,10 @@ void* heathens_f(void *param) {
 
 		if (heathens == 0) {
 			if (status == TRANSITION_TO_PRUDES)
-				sem_post(&prudesTurn);
+				sem_post(&heathensTurn);
+
 			if (prudes) {
-				sem_post(&prudesQueue);
+				sem_post_many(&prudesQueue, prudes);
 				status = PRUDES_RULE;
 			} else
 				status = NEUTRAL;
@@ -68,7 +70,6 @@ void* heathens_f(void *param) {
 		}
 
 		sem_post(&mutex);
-		sleep(1);
 	}
 
 	return NULL;
