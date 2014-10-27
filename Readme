@@ -1,0 +1,13 @@
+Grupo:
+
+Diego Rocha 		135494
+Guilherme Mazzariol	138466
+Tomas Queiroga		137748
+
+Animacao em caracteres ASCII do problema do Modus Hall.
+Cada grupo (Heathens ou Prudes) atravessa o hall apenas quando o outro grupo terminou de passar, e está em maior número.
+Apenas um membro do grupo atravessa o hall de cada vez.
+Tamanho do hall, numero de Heathens e numero de Prudes esta flexivel. Ao rodar o programa, ele solicita tais valores.
+
+make para compilar
+make run para compilar e executar a animacao.
