@@ -9,16 +9,15 @@
 
 void* heathens_f(void *param) {
 	int i;
-	int threadId = *(int *) param;
+	Thread thread = (Thread) param;
 
 	while (1) {
-		printf("\n%02d arrived\n", threadId);
 		sem_wait(&heathensTurn);
 		sem_post(&heathensTurn);
 		sem_wait(&mutex);
 		heathens++;
 
-		renderState(threadId);
+		renderState(thread);
 
 		if (status == NEUTRAL) {
 			status = HEATHENS_RULE;
@@ -42,8 +41,8 @@ void* heathens_f(void *param) {
 		crossingState = HEATHENS_CROSSING;
 		for (i = 0; i < HALL_DISTANCE; i++) {
 			crossingPosition = i;
-			renderState(threadId);
-			sleep(1);
+			renderState(thread);
+			usleep(SLEEP_DELAY);
 		}
 		crossingState = NONE_CROSSING;
 
@@ -51,7 +50,7 @@ void* heathens_f(void *param) {
 
 		sem_wait(&mutex);
 		heathens--;
-		renderState(threadId);
+		renderState(thread);
 
 		if (heathens == 0) {
 			if (status == TRANSITION_TO_PRUDES)
@@ -70,7 +69,10 @@ void* heathens_f(void *param) {
 		}
 
 		sem_post(&mutex);
+
+		usleep(2 * (SLEEP_DELAY * HALL_DISTANCE) + rand() % (SLEEP_DELAY * HALL_DISTANCE * maxHeathens));
 	}
 
 	return NULL;
 }
+

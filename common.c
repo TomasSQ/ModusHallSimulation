@@ -40,116 +40,57 @@ char* statusStr(int status) {
 	}
 }
 
-void renderState (int threadId) {
+void printNSpaces(int n) {
 	int i;
-	int heathensQueueSize = heathens;
-	int heathensQueueStartPosition = MAX_HEATHENS - heathensQueueSize;
-	int prudesQueueSize = prudes;
-	/*int mutexInt, prudesTurnInt, heathensTurnInt, prudesQueueInt, heathensQueueInt;*/
+	for (i = 0; i < n; i++)
+		printf(" ");
+}
 
-	sem_wait(&animation);
+void printHall() {
+	int i;
+	for (i = 0; i < 3 * HALL_DISTANCE; i++)
+		printf("_");
+}
 
-	system("clear");
-
-	for (i = 0; i < 43; i++) printf(" ");
-	printf("Modus Hall\n\n");
-
-	printf("Thread ativa:\t%02d\n", threadId);
-	printf("Estado:\t\t%s\n", statusStr(status));
-
-	printf("Prudes:\t\t%02d\n", prudes);
-	printf("Heathens:\t%02d\n", heathens);
-
-	printf("\n\n");
-
-	if (crossingState == HEATHENS_CROSSING) {
-		heathensQueueSize--;
-	} else if (crossingState == PRUDES_CROSSING) {
-		prudesQueueSize--;
-	}
-
-	/* Field top border */
-	for (i = 0; i < 3 * MAX_HEATHENS; i++) printf(" ");
-	printf("   ");
-
-	for (i = 0; i < (3 * HALL_DISTANCE); i++) printf("_");
-	printf("\n");
-
-	/* Head animation */
-	for (i = 0; i < MAX_HEATHENS; i++) {
-		if (i > heathensQueueStartPosition) {
-			printf("%s", waitingHead);
-		} else {
+void printWaitingAndWalking(char* waiting, char *walking, int heathensQueueStartPosition, int prudesQueueSize) {
+	int i;
+	for (i = 0; i < maxHeathens; i++)
+		if (i > heathensQueueStartPosition)
+			printf("%s", waiting);
+		else
 			printf("   ");
-		}
-	}
 
 	printf("   ");
 
-	for (i = 0; i < HALL_DISTANCE; i++) {
-		if (crossingState != 0 && crossingPosition == i) {
-			printf("%s", walkingHead);
-		} else {
+	for (i = 0; i < HALL_DISTANCE; i++)
+		if (crossingState != 0 && crossingPosition == i)
+			printf("%s", walking);
+		else
 			printf("   ");
-		}
-	}
 
 	printf("   ");
 
-	for (i = 0; i < MAX_PRUDES; i++) {
-		if (i < prudesQueueSize) {
-			printf("%s", waitingHead);
-		} else {
+	for (i = 0; i < maxPrudes; i++)
+		if (i < prudesQueueSize)
+			printf("%s", waiting);
+		else
 			printf("   ");
-		}
-	}
 
 	printf("\n");
+}
 
-	/* Torso animation */
-	for (i = 0; i < MAX_HEATHENS; i++) {
-		if (i > heathensQueueStartPosition) {
-			printf("%s", waitingTorso);
-		} else {
-			printf("   ");
-		}
-	}
-
-	printf("   ");
-
-	for (i = 0; i < HALL_DISTANCE; i++) {
-		if (crossingState != 0 && crossingPosition == i) {
-			printf("%s", walkingTorso);
-		} else {
-			printf("   ");
-		}
-	}
-
-	printf("   ");
-
-	for (i = 0; i < MAX_PRUDES; i++) {
-		if (i < prudesQueueSize) {
-			printf("%s", waitingTorso);
-		} else {
-			printf("   ");
-		}
-	}
-
-	printf("\n");
-
-	/* Legs animation */
-	for (i = 0; i < MAX_HEATHENS; i++) {
-		if (i > heathensQueueStartPosition) {
+void printLegsAnimation(int heathensQueueStartPosition, int prudesQueueSize) {
+	int i;
+	for (i = 0; i < maxHeathens; i++)
+		if (i > heathensQueueStartPosition)
 			printf("%s", legs2);
-		} else {
+		else
 			printf("   ");
-		}
-	}
 
 	printf("   ");
 
-	for (i = 0; i < HALL_DISTANCE; i++) {
-		if (crossingState != 0 && crossingPosition == i) {
+	for (i = 0; i < HALL_DISTANCE; i++)
+		if (crossingState != 0 && crossingPosition == i)
 			switch (crossingPosition % 3) {
 				case 0:
 					printf("%s", (crossingState == 1 ? legs1 : legs3));
@@ -161,42 +102,79 @@ void renderState (int threadId) {
 					printf("%s", (crossingState == 1 ? legs4 : legs5));
 					break;
 			}
-		} else {
+		else
 			printf("   ");
-		}
-	}
 
 	printf("   ");
 
-	for (i = 0; i < MAX_PRUDES; i++) {
-		if (i < prudesQueueSize) {
+	for (i = 0; i < maxPrudes; i++)
+		if (i < prudesQueueSize)
 			printf("%s", legs2);
-		} else {
+		else
 			printf("   ");
-		}
-	}
 
 	printf("\n");
+}
+
+void renderState (Thread thread) {
+	int i;
+	int heathensQueueSize = heathens;
+	int heathensQueueStartPosition = maxHeathens - heathensQueueSize;
+	int prudesQueueSize = prudes;
+
+	sem_wait(&animation);
+
+	system("clear");
+
+	printNSpaces(43);
+	printf("Modus Hall\n\n");
+
+	printf("Thread ativa:\t%02d\n", thread->id);
+	printf("Estado:\t\t%s\n", statusStr(status));
+
+	printf("Prudes:\t\t%02d\n", prudes);
+	printf("Heathens:\t%02d\n", heathens);
+
+	printf("\n\n");
+
+	if (crossingState == HEATHENS_CROSSING)
+		heathensQueueSize--;
+	else if (crossingState == PRUDES_CROSSING)
+		prudesQueueSize--;
+
+	/* Field top border */
+	printNSpaces(3 * maxHeathens);
+	printf("   ");
+
+	printHall();
+	printf("\n");
+
+	/* Head animation */
+	printWaitingAndWalking(waitingHead, walkingHead, heathensQueueStartPosition, prudesQueueSize);
+	
+	/* Torso animation */
+	printWaitingAndWalking(waitingTorso, walkingTorso, heathensQueueStartPosition, prudesQueueSize);
+
+	/* Legs animation */
+	printLegsAnimation(heathensQueueStartPosition, prudesQueueSize);
 
 	/* Field bottom border */
-	for (i = 0; i < 3 * MAX_HEATHENS; i++) printf(" ");
+	printNSpaces(3 * maxHeathens);
 	printf("   ");
 
-	for (i = 0; i < (3 * HALL_DISTANCE); i++) printf("_");
+	printHall();
 	printf("\n");
 
-	for (i = 0; i < MAX_HEATHENS; i++) {
-		if (i > heathensQueueStartPosition) {
+	for (i = 0; i < maxHeathens; i++)
+		if (i > heathensQueueStartPosition)
 			printf("[H]");
-		} else {
+		else
 			printf("   ");
-		}
-	}
 
 	printf(" | ");
 
-	for (i = 0; i < HALL_DISTANCE; i++) {
-		if (crossingState != NONE_CROSSING && crossingPosition == i) {
+	for (i = 0; i < HALL_DISTANCE; i++)
+		if (crossingState != NONE_CROSSING && crossingPosition == i)
 			switch (crossingState) {
 				case HEATHENS_CROSSING:
 					printf("[H]");
@@ -207,22 +185,47 @@ void renderState (int threadId) {
 				default:
 					printf("[who am I?]");
 			}
-		} else {
+		else
 			printf("   ");
-		}
-	}
 
 	printf(" | ");
 
-	for (i = 0; i < MAX_PRUDES; i++) {
-		if (i < prudesQueueSize) {
+	for (i = 0; i < maxPrudes; i++)
+		if (i < prudesQueueSize)
 			printf("[P]");
-		} else {
+		else
 			printf("   ");
-		}
-	}
-	
+
 	fflush(stdout);
 
 	sem_post(&animation);
 }
+
+Thread newThread(int id, void *(*start_routine)(void*)) {
+	Thread thread = (Thread) malloc(sizeof(thread));
+	thread->id = id;
+	pthread_create(&thread->thread, NULL, start_routine, (void*) thread);
+
+	return thread;
+}
+
+Threads newThreads(int* ids, void *(*start_routine)(void*), int size) {
+	int i;
+	Threads threads = (Threads) malloc(sizeof(threads));
+	threads->size = size;
+
+	threads->threads = (Thread*) malloc(sizeof(Thread) * size);
+
+	for (i = 0; i < threads->size; i++)
+		threads->threads[i] = newThread(ids[i], start_routine);
+
+	return threads;
+}
+
+void startThreads(Threads threads) {
+	int i;
+
+	for (i = 0; i < threads->size; i++)
+		pthread_join(threads->threads[i]->thread, NULL);
+}
+

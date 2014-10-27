@@ -43,10 +43,8 @@ void destruirSemaforos() {
 }
 
 int main() {
-	pthread_t heathens_t[MAX_HEATHENS];
-	pthread_t prudes_t[MAX_PRUDES];
-	int heathens_id[MAX_HEATHENS];
-	int prudes_id[MAX_PRUDES];
+	int* heathens_id;
+	int* prudes_id;
 	int i;
 
 	status = NEUTRAL;
@@ -54,26 +52,26 @@ int main() {
 	crossingPosition = 0;
 	prudes = 0;
 	heathens = 0;
+	printf("Quantos Heathens? ");
+	scanf("%d", &maxHeathens);
+	printf("\nQuantos Prudes? ");
+	scanf("%d", &maxPrudes);
 	inicializarSemaforos();
 
+	heathens_id = (int*) malloc(sizeof(int) * maxHeathens);
+	prudes_id = (int*) malloc(sizeof(int) * maxPrudes);
+
 	printf("Inicializando Heathens e Prudes...\n");
-	for (i = 0; i < MAX_HEATHENS; i++) {
+	for (i = 0; i < maxHeathens; i++)
 		heathens_id[i] = i + 1;
-		pthread_create(&heathens_t[i], NULL, heathens_f, (void*) &heathens_id[i]);
-	}
+	heathens_t = newThreads(heathens_id, heathens_f, maxHeathens);
 
-	for (i = 0; i < MAX_PRUDES; i++) {
+	for (i = 0; i < maxPrudes; i++)
 		prudes_id[i] = (i + 1) * 10;
-		pthread_create(&prudes_t[i], NULL, prudes_f, (void*) &prudes_id[i]);
-	}
+	prudes_t = newThreads(prudes_id, prudes_f, maxPrudes);
 
-	for (i = 0; i < MAX_HEATHENS; i++) {
-		pthread_join(heathens_t[i], NULL);
-	}
-
-	for (i = 0; i < MAX_PRUDES; i++) {
-		pthread_join(prudes_t[i], NULL);
-	}
+	startThreads(heathens_t);
+	startThreads(prudes_t);
 
 	printf("Heathens e Prudes inicializados!\n");
 

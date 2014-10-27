@@ -8,15 +8,14 @@
 
 void* prudes_f(void *param) {
 	int i;
-	int threadId = *(int *) param;
+	Thread thread = (Thread) param;
 
 	while (1) {
-		printf("\n%02d arrived\n", threadId);
 		sem_wait(&prudesTurn);
 		sem_post(&prudesTurn);
 		sem_wait(&mutex);
 		prudes++;
-		renderState(threadId);
+		renderState(thread);
 
 		if (status == NEUTRAL) {
 			status = PRUDES_RULE;
@@ -42,8 +41,8 @@ void* prudes_f(void *param) {
 		crossingState = PRUDES_CROSSING;
 		for (i = HALL_DISTANCE - 1; i >= 0; i--) {
 			crossingPosition = i;
-			renderState(threadId);
-			sleep(1);
+			renderState(thread);
+			usleep(SLEEP_DELAY);
 		}
 
 		crossingState = NONE_CROSSING;
@@ -52,7 +51,7 @@ void* prudes_f(void *param) {
 
 		sem_wait(&mutex);
 		prudes--;
-		renderState(threadId);
+		renderState(thread);
 
 		if (prudes == 0) {
 			if (status == TRANSITION_TO_HEATHENS)
@@ -71,7 +70,10 @@ void* prudes_f(void *param) {
 		}
 
 		sem_post(&mutex);
+
+		usleep(2 * (SLEEP_DELAY * HALL_DISTANCE) + rand() % (SLEEP_DELAY * HALL_DISTANCE * maxPrudes));
 	}
 
 	return NULL;
 }
+
