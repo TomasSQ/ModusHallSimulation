@@ -62,9 +62,9 @@ void renderState (int threadId) {
 
 	printf("\n\n");
 
-	if (crossingState == 1) {
+	if (crossingState == HEATHENS_CROSSING) {
 		heathensQueueSize--;
-	} else if (crossingState == 2) {
+	} else if (crossingState == PRUDES_CROSSING) {
 		prudesQueueSize--;
 	}
 
@@ -196,13 +196,16 @@ void renderState (int threadId) {
 	printf(" | ");
 
 	for (i = 0; i < HALL_DISTANCE; i++) {
-		if (crossingState != 0 && crossingPosition == i) {
-			if (crossingState == 1) {
-				printf("[H]");
-			} else if (crossingState == 2) {
-				printf("[P]");
-			} else {
-				printf("[who am I?]");
+		if (crossingState != NONE_CROSSING && crossingPosition == i) {
+			switch (crossingState) {
+				case HEATHENS_CROSSING:
+					printf("[H]");
+					break;
+				case PRUDES_CROSSING:
+					printf("[P]");
+					break;
+				default:
+					printf("[who am I?]");
 			}
 		} else {
 			printf("   ");

@@ -39,13 +39,13 @@ void* heathens_f(void *param) {
 
 		/* cross the field */
 		sem_wait(&crossing);
-		crossingState = 1;
+		crossingState = HEATHENS_CROSSING;
 		for (i = 0; i < HALL_DISTANCE; i++) {
 			crossingPosition = i;
 			renderState(threadId);
 			sleep(1);
 		}
-		crossingState = 0;
+		crossingState = NONE_CROSSING;
 
 		sem_post(&crossing);
 

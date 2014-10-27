@@ -39,14 +39,14 @@ void* prudes_f(void *param) {
 
 		/* cross the field */
 		sem_wait(&crossing);
-		crossingState = 2;
-		for (i = HALL_DISTANCE-1; i >= 0; i--) {
+		crossingState = PRUDES_CROSSING;
+		for (i = HALL_DISTANCE - 1; i >= 0; i--) {
 			crossingPosition = i;
 			renderState(threadId);
 			sleep(1);
 		}
 
-		crossingState = 0;
+		crossingState = NONE_CROSSING;
 
 		sem_post(&crossing);
 
