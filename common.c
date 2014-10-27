@@ -6,6 +6,15 @@
 
 #include "common.h"
 
+/* Desenhos para posições da cabeça  na animação */
+char* waitingHead = "_O_";
+char* walkingHead = " O ";
+
+/* Desenhos para posições do torso na animação */
+char* waitingTorso = " | ";
+char* walkingTorso = "/|\\";
+
+/* Desenhos para posições das pernas na animação */
 char* legs1 = " |\\";
 char* legs2 = "/ \\";
 char* legs3 = "/| ";
@@ -18,17 +27,16 @@ void sem_post_many(Semaforo semaforo, int many) {
 }
 
 /*
-* Retorna o nome do status, normalizado para 22 chars (precisamos normalizar
-* para que a animação funciona corretamente, aka workaround)
+* Retorna o nome do status.
 */
 char* statusStr(int status) {
 	switch (status) {
-		case NEUTRAL : return "NEUTRAL               ";
-		case HEATHENS_RULE : return "HEATHENS RULE         ";
-		case PRUDES_RULE : return "PRUDES RULE           ";
-		case TRANSITION_TO_HEATHENS : return "TRANSITION TO HEATHENS";
-		case TRANSITION_TO_PRUDES : return "TRANSITION TO PRUDES  ";
-		default : return "WTF IS GOING ON?";
+		case NEUTRAL:				return "NEUTRAL";
+		case HEATHENS_RULE:			return "HEATHENS RULE";
+		case PRUDES_RULE:			return "PRUDES RULE";
+		case TRANSITION_TO_HEATHENS:return "TRANSITION TO HEATHENS";
+		case TRANSITION_TO_PRUDES:	return "TRANSITION TO PRUDES";
+		default :					return "WTF IS GOING ON?";
 	}
 }
 
@@ -70,7 +78,7 @@ void renderState (int threadId) {
 	/* Head animation */
 	for (i = 0; i < MAX_HEATHENS; i++) {
 		if (i > heathensQueueStartPosition) {
-			printf("_O_");
+			printf("%s", waitingHead);
 		} else {
 			printf("   ");
 		}
@@ -80,7 +88,7 @@ void renderState (int threadId) {
 
 	for (i = 0; i < HALL_DISTANCE; i++) {
 		if (crossingState != 0 && crossingPosition == i) {
-			printf(" O ");
+			printf("%s", walkingHead);
 		} else {
 			printf("   ");
 		}
@@ -90,7 +98,7 @@ void renderState (int threadId) {
 
 	for (i = 0; i < MAX_PRUDES; i++) {
 		if (i < prudesQueueSize) {
-			printf("_O_");
+			printf("%s", waitingHead);
 		} else {
 			printf("   ");
 		}
@@ -101,7 +109,7 @@ void renderState (int threadId) {
 	/* Torso animation */
 	for (i = 0; i < MAX_HEATHENS; i++) {
 		if (i > heathensQueueStartPosition) {
-			printf(" | ");
+			printf("%s", waitingTorso);
 		} else {
 			printf("   ");
 		}
@@ -111,7 +119,7 @@ void renderState (int threadId) {
 
 	for (i = 0; i < HALL_DISTANCE; i++) {
 		if (crossingState != 0 && crossingPosition == i) {
-			printf("/|\\");
+			printf("%s", walkingTorso);
 		} else {
 			printf("   ");
 		}
@@ -121,7 +129,7 @@ void renderState (int threadId) {
 
 	for (i = 0; i < MAX_PRUDES; i++) {
 		if (i < prudesQueueSize) {
-			printf(" | ");
+			printf("%s", waitingTorso);
 		} else {
 			printf("   ");
 		}
@@ -132,7 +140,7 @@ void renderState (int threadId) {
 	/* Legs animation */
 	for (i = 0; i < MAX_HEATHENS; i++) {
 		if (i > heathensQueueStartPosition) {
-			printf("/ \\");
+			printf("%s", legs2);
 		} else {
 			printf("   ");
 		}
@@ -162,7 +170,7 @@ void renderState (int threadId) {
 
 	for (i = 0; i < MAX_PRUDES; i++) {
 		if (i < prudesQueueSize) {
-			printf("/ \\");
+			printf("%s", legs2);
 		} else {
 			printf("   ");
 		}
@@ -211,14 +219,6 @@ void renderState (int threadId) {
 		}
 	}
 	
-	/* Debug
-	sem_getvalue(&mutex, &mutexInt);
-	sem_getvalue(&prudesTurn, &prudesTurnInt);
-	sem_getvalue(&heathensTurn, &heathensTurnInt);
-	sem_getvalue(&prudesQueue, &prudesQueueInt);
-	sem_getvalue(&heathensQueue, &heathensQueueInt);
-
-	printf("mutex: %d, prudesTurn: %d, heathensTurn: %d, prudesQueue: %d, heathensQueue: %d\n", mutexInt, prudesTurnInt, heathensTurnInt, prudesQueueInt, heathensQueueInt); */
 	fflush(stdout);
 
 	sem_post(&animation);
